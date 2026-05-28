@@ -1,1 +1,92 @@
+n = int(input("Enter number of rows: "))
 
+# 1. Right Triangle of Stars
+print("\n1. Right Triangle of Stars")
+for i in range(1, n + 1):
+    for j in range(i):
+        print("*", end=" ")
+    print()
+
+# 2. Inverted Triangle of Numbers
+print("\n2. Inverted Triangle of Numbers")
+for i in range(n, 0, -1):
+    for j in range(1, i + 1):
+        print(j, end=" ")
+    print()
+
+# 3. Pascal's Triangle
+print("\n3. Pascal's Triangle")
+for i in range(n):
+    num = 1
+    for j in range(i + 1):
+        print(num, end=" ")
+        num = num * (i - j) // (j + 1)
+    print()
+
+# 4. Prime Numbers up to n
+print("\n4. Prime Numbers up to", n)
+
+for num in range(2, n + 1):
+    for i in range(2, num):
+        if num % i == 0:
+            break
+    else:
+        print(num, end=" ")
+
+
+import random
+
+target_units = int(input("Enter target units: "))
+workers_per_shift = int(input("Enter workers per shift: "))
+defect_rate = float(input("Enter defect rate (%): "))
+
+total_production = 0
+total_defects = 0
+
+print("\nProduction Started...\n")
+
+for shift in range(1, 4):  # 3 shifts
+    print("Shift", shift)
+
+    shift_production = 0
+    shift_defects = 0
+
+    for cycle in range(1, 21):  # 20 machine cycles
+
+        items_produced = random.randint(5, 20)
+
+        defective = random.randint(1, 100)
+
+        # Skip defective items using continue
+        if defective <= defect_rate:
+            shift_defects += items_produced
+            total_defects += items_produced
+            print("Cycle", cycle, ": Defective items skipped")
+            continue
+
+        shift_production += items_produced
+        total_production += items_produced
+
+        print("Cycle", cycle, "- Produced:", items_produced)
+
+        # Stop when target is reached using break
+        if total_production >= target_units:
+            print("\nTarget Reached! Stopping Production")
+            break
+
+    print("\nShift Report")
+    print("Workers:", workers_per_shift)
+    print("Items Produced:", shift_production)
+    print("Defects:", shift_defects)
+
+    productivity = shift_production / workers_per_shift
+    print("Worker Productivity:", productivity)
+
+    print("-" * 30)
+
+    if total_production >= target_units:
+        break
+
+print("\nFinal Report")
+print("Total Production:", total_production)
+print("Total Defects:", total_defects)
