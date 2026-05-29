@@ -1,1 +1,130 @@
+from tkinter import *
+from tkinter import messagebox
+
+root = Tk()
+root.title("EMI Calculator")
+root.geometry("400x400")
+root.configure(bg="lightblue")
+
+Label(root, text="EMI Calculator",
+      font=("Arial", 20, "bold"),
+      bg="lightblue").pack(pady=20)
+
+Label(root, text="Principal Amount",
+      bg="lightblue").pack()
+
+principal = Entry(root)
+principal.pack()
+
+Label(root, text="Interest Rate (%)",
+      bg="lightblue").pack()
+
+rate = Entry(root)
+rate.pack()
+
+Label(root, text="Time (Years)",
+      bg="lightblue").pack()
+
+time = Entry(root)
+time.pack()
+
+def calculate_emi():
+    p = float(principal.get())
+    r = float(rate.get()) / 12 / 100
+    t = int(time.get()) * 12
+
+    emi = (p * r * (1 + r) ** t) / ((1 + r) ** t - 1)
+
+    messagebox.showinfo("Result",
+                        f"Monthly EMI = {round(emi,2)}")
+
+Button(root, text="Calculate EMI",
+       bg="blue", fg="white",
+       command=calculate_emi).pack(pady=20)
+
+root.mainloop()
+
+
+
+from tkinter import *
+from tkinter import messagebox
+	
+root = Tk()
+root.title("Tax Calculator")
+root.geometry("400x400")
+root.configure(bg="lightgreen")
+
+Label(root, text="Tax Calculator",
+      font=("Arial", 20, "bold"),
+      bg="lightgreen").pack(pady=20)
+
+Label(root, text="Enter Annual Income",
+      bg="lightgreen").pack()
+
+income = Entry(root)
+income.pack()
+
+
+def calculate_tax():
+    inc = float(income.get())
+
+    if inc <= 500000:
+        tax = 0
+    elif inc <= 1000000:
+        tax = inc * 0.10
+    else:
+        tax = inc * 0.20
+
+    messagebox.showinfo("Result",
+                        f"Tax Amount = {tax}")
+
+
+Button(root, text="Calculate Tax",
+       bg="green", fg="white",
+       command=calculate_tax).pack(pady=20)
+
+root.mainloop()
+
+
+
+from tkinter import *
+from tkinter import messagebox
+
+root = Tk()
+root.title("Attendance Calculator")
+root.geometry("400x400")
+root.configure(bg="gold")
+
+Label(root, text="Attendance Calculator",
+      font=("Arial", 20, "bold"),
+      bg="gold").pack(pady=20)
+
+Label(root, text="Enter Total Classes",
+      bg="gold").pack()
+
+total = Entry(root)
+total.pack()
+
+Label(root, text="Enter Attended Classes",
+      bg="gold").pack()
+
+attended = Entry(root)
+attended.pack()
+
+def calculate_attendance():
+    t = int(total.get())
+    a = int(attended.get())
+
+    percentage = (a / t) * 100
+
+    messagebox.showinfo(
+        "Result",
+        f"Attendance = {round(percentage,2)}%"
+    )
+
+Button(root, text="Calculate Attendance",
+       bg="orange", fg="white",
+       command=calculate_attendance).pack(pady=20)
+
+root.mainloop()
 
