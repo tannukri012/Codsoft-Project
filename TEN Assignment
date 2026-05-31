@@ -1,1 +1,283 @@
+from tkinter import *
+from tkinter import messagebox, ttk
 
+# ================== INVENTORY CLASS ==================
+class InventorySystem:
+
+    def __init__(self):
+        self.products = {}      # dict
+        self.categories = set() # set
+
+    # Add Product
+    def add_product(self, pid, name, category, qty, price, supplier):
+        self.products[pid] = {
+            "name": name,
+            "category": category,
+            "qty": qty,
+            "price": price,
+            "supplier": supplier
+        }
+        self.categories.add(category)
+
+    # Update Product
+    def update_product(self, pid, qty, price):
+        if pid in self.products:
+            self.products[pid]["qty"] = qty
+            self.products[pid]["price"] = price
+            return True
+        return False
+
+    # Search Product
+    def search_product(self, search):
+        results = []
+
+        for pid, data in self.products.items():
+            if search.lower() == pid.lower() or search.lower() == data["name"].lower():
+                results.append((pid, data))  # tuple
+
+        return results
+
+    # Delete Product
+    def delete_product(self, pid):
+        if pid in self.products:
+            del self.products[pid]
+            return True
+        return False
+
+    # Low Stock
+    def low_stock(self):
+        return [p for p in self.products.items() if p[1]["qty"] < 10]
+
+    # Out of Stock
+    def out_of_stock(self):
+        return [p for p in self.products.items() if p[1]["qty"] == 0]
+
+    # Inventory Report
+    def inventory_report(self):
+        total_items = len(self.products)
+        total_value = sum(
+            p["qty"] * p["price"]
+            for p in self.products.values()
+        )
+
+        return total_items, total_value
+
+
+# ================== GUI ==================
+inventory = InventorySystem()
+
+root = Tk()
+root.title("Smart Inventory Management System")
+root.geometry("1100x700")
+root.configure(bg="#e9e9e9")
+
+# ================= HEADER =================
+header = Label(
+    root,
+    text="🏢 Smart Inventory Management System",
+    font=("Arial", 24, "bold"),
+    bg="#2d3561",
+    fg="white",
+    pady=15
+)
+header.pack(fill=X)
+
+# ================= ENTRY FRAME =================
+entry_frame = Frame(root, bg="white")
+entry_frame.pack(fill=X, padx=20, pady=10)
+
+labels = ["Product ID", "Name", "Category",
+          "Quantity", "Price", "Supplier"]
+
+entries = {}
+
+for i, text in enumerate(labels):
+    Label(entry_frame, text=text,
+          bg="white",
+          font=("Arial", 11, "bold")).grid(row=0, column=i)
+
+    e = Entry(entry_frame, width=15)
+    e.grid(row=1, column=i, padx=5, pady=5)
+    entries[text] = e
+
+
+# ================= TABLE =================
+tree = ttk.Treeview(root, columns=(
+    "ID", "Name", "Category",
+    "Qty", "Price", "Supplier"
+), show="headings")
+
+for col in tree["columns"]:
+    tree.heading(col, text=col)
+    tree.column(col, width=150)
+
+tree.pack(fill=BOTH, expand=True, padx=20, pady=20)
+
+
+def refresh_table():
+    for item in tree.get_children():
+        tree.delete(item)
+
+    for pid, data in inventory.products.items():
+        tree.insert("", END, values=(
+            pid,
+            data["name"],
+            data["category"],
+            data["qty"],
+            data["price"],
+            data["supplier"]
+        ))
+
+
+# ================= BUTTON FUNCTIONS =================
+def add_product():
+    pid = entries["Product ID"].get()
+    name = entries["Name"].get()
+    category = entries["Category"].get()
+    qty = int(entries["Quantity"].get())
+    price = float(entries["Price"].get())
+    supplier = entries["Supplier"].get()
+
+    inventory.add_product(
+        pid, name, category,
+        qty, price, supplier
+    )
+
+    refresh_table()
+    messagebox.showinfo("Success", "Product Added!")
+
+
+def update_product():
+    pid = entries["Product ID"].get()
+    qty = int(entries["Quantity"].get())
+    price = float(entries["Price"].get())
+
+    if inventory.update_product(pid, qty, price):
+        refresh_table()
+        messagebox.showinfo("Updated", "Inventory Updated")
+    else:
+        messagebox.showerror("Error", "Product not found")
+
+
+def search_product():
+    search = entries["Name"].get()
+
+    results = inventory.search_product(search)
+
+    if results:
+        text = ""
+
+        for pid, data in results:
+            text += f"""
+ID: {pid}
+Name: {data['name']}
+Category: {data['category']}
+Qty: {data['qty']}
+Price: {data['price']}
+Supplier: {data['supplier']}
+
+"""
+
+        messagebox.showinfo("Search Result", text)
+    else:
+        messagebox.showerror("Error", "Product not found")
+
+
+def delete_product():
+    pid = entries["Product ID"].get()
+
+    if inventory.delete_product(pid):
+        refresh_table()
+        messagebox.showinfo("Deleted", "Product Deleted")
+    else:
+        messagebox.showerror("Error", "Product not found")
+
+
+def low_stock():
+    data = inventory.low_stock()
+
+    msg = ""
+
+    for pid, item in data:
+        msg += f"{item['name']} (Qty: {item['qty']})\n"
+
+    if msg == "":
+        msg = "No Low Stock Products"
+
+    messagebox.showinfo("Low Stock Alert", msg)
+
+
+def out_stock():
+    data = inventory.out_of_stock()
+
+    msg = ""
+
+    for pid, item in data:
+        msg += f"{item['name']}\n"
+
+    if msg == "":
+        msg = "No Out Of Stock Products"
+
+    messagebox.showinfo("Out Of Stock", msg)
+
+
+def inventory_report():
+    total_items, total_value = inventory.inventory_report()
+
+    messagebox.showinfo(
+        "Inventory Report",
+        f"Total Products: {total_items}\n"
+        f"Total Value: ₹{total_value}"
+    )
+
+
+def category_management():
+    categories = "\n".join(inventory.categories)
+
+    if categories == "":
+        categories = "No Categories"
+
+    messagebox.showinfo(
+        "Categories",
+        categories
+    )
+
+
+# ================= BUTTONS =================
+button_frame = Frame(root, bg="#e9e9e9")
+button_frame.pack(pady=10)
+
+buttons = [
+    ("Add Product", add_product),
+    ("Update Inventory", update_product),
+    ("Search Product", search_product),
+    ("Display Inventory", refresh_table),
+    ("Delete Product", delete_product),
+    ("Low Stock Alert", low_stock),
+    ("Out of Stock Alert", out_stock),
+    ("Inventory Report", inventory_report),
+    ("Category Management", category_management)
+]
+
+row = 0
+col = 0
+
+for text, command in buttons:
+    Button(
+        button_frame,
+        text=text,
+        width=22,
+        height=2,
+        command=command,
+        bg="#2d3561",
+        fg="white",
+        font=("Arial", 10, "bold")
+    ).grid(row=row, column=col, padx=8, pady=8)
+
+    col += 1
+
+    if col == 3:
+        row += 1
+        col = 0
+
+root.mainloop()
