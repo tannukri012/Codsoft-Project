@@ -1,1 +1,63 @@
+import csv
 
+# Step 1: Create CSV file and store data of 10 students
+students = [
+    [1, "Aman", 85, 78, 90, 88],
+    [2, "Priya", 92, 89, 95, 91],
+    [3, "Rahul", 76, 80, 72, 79],
+    [4, "Neha", 88, 85, 90, 87],
+    [5, "Rohit", 70, 75, 68, 72],
+    [6, "Anjali", 95, 98, 97, 96],
+    [7, "Vikas", 82, 79, 85, 80],
+    [8, "Sneha", 90, 92, 88, 91],
+    [9, "Arjun", 78, 74, 80, 77],
+    [10, "Kavya", 86, 89, 84, 88]
+]
+
+with open("student.csv", "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["Roll No", "Name", "Maths", "Science", "English", "Computer"])
+    writer.writerows(students)
+
+print("CSV file created successfully.\n")
+
+# Step 2: Read and display all student records
+print("Student Records:")
+with open("student.csv", "r") as file:
+    reader = csv.reader(file)
+    for row in reader:
+        print(row)
+
+# Step 3: Find student with highest marks
+highest_student = None
+highest_total = 0
+overall_total = 0
+student_count = 0
+
+with open("student.csv", "r") as file:
+    reader = csv.DictReader(file)
+
+    for row in reader:
+        total = (
+            int(row["Maths"]) +
+            int(row["Science"]) +
+            int(row["English"]) +
+            int(row["Computer"])
+        )
+
+        overall_total += total
+        student_count += 1
+
+        if total > highest_total:
+            highest_total = total
+            highest_student = row["Name"]
+
+# Step 4: Calculate average marks of all students
+average_marks = overall_total / student_count
+
+print("\nHighest Scoring Student:")
+print("Name:", highest_student)
+print("Total Marks:", highest_total)
+
+print("\nAverage Marks of All Students:")
+print(round(average_marks, 2))
